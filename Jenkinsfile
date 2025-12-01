@@ -1,35 +1,47 @@
 pipeline {
     agent any
 
-    tools {
-        jdk 'JDK_21'
-        maven 'Maven_3.9'
+    environment {
+        SONAR_HOST_URL = 'http://localhost:9002'
+        SONAR_AUTH_TOKEN = credentials('sonar-groceryshopping-token')
     }
 
     stages {
-
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main', url: 'https://github.com/Nishath-Syed/GroceryShopping.git'
             }
         }
 
         stage('Build') {
             steps {
-                bat "mvn clean package"
+                sh 'mvn clean install'
             }
         }
 
-        stage('Test') {
+        stage('SonarQube Analysis') {
             steps {
-                bat "mvn test"
+                withSonarQubeEnv('SonarQube_GroceryShopping_Server') {
+                    sh 'mvn sonar:sonar'
+                }
             }
         }
 
-        stage('Deploy') {
+        stage('Quality Gate') {
             steps {
-                echo "Deploying application..."
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
         }
     }
 }
