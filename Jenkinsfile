@@ -15,14 +15,15 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mvn clean install'
+                // Use bat for Windows
+                bat 'mvn clean install'
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube_GroceryShopping_Server') {
-                    sh 'mvn sonar:sonar'
+                    bat 'mvn sonar:sonar'
                 }
             }
         }
