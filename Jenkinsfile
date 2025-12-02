@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         SONAR_HOST_URL = 'http://localhost:9002'
-        SONAR_AUTH_TOKEN = credentials('sonar-groceryshopping-token')
+        SONAR_AUTH_TOKEN = credentials('groc-token')
     }
 
     stages {
